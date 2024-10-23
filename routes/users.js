@@ -9,13 +9,13 @@ const users = require("../data/users.js")
 // Creating a simple GET route for individual users,
 // using a route parameter for the unique id.
 router.get('/', (req, res) => {
-  // const links = [
-  //   {
-  //     href: "users/:id",
-  //     rel: ":id",
-  //     type: "GET",
-  //   },
-  // ];
+  const links = [
+    {
+      href: "users/:id",
+      rel: ":id",
+      type: "GET",
+    },
+  ];
 
   res.json({ users, links });
 })
@@ -25,18 +25,18 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const user = users.find(u => u.id == req.params.id)
   console.log(user)
-  // const links = [
-  //   {
-  //     href: `/${req.params.id}`,
-  //     rel: "",
-  //     type: "PATCH",
-  //   },
-  //   {
-  //     href: `/${req.params.id}`,
-  //     rel: "",
-  //     type: "DELETE",
-  //   },
-  // ];
+  const links = [
+    {
+      href: `/${req.params.id}`,
+      rel: "",
+      type: "PATCH",
+    },
+    {
+      href: `/${req.params.id}`,
+      rel: "",
+      type: "DELETE",
+    },
+  ];
 
   if (user) res.json({ user, links });
   else next();
@@ -45,6 +45,16 @@ router.get('/:id', (req, res) => {
 //Search user by name
 router.get('/name/:name', (req, res) => {
   const user = users.find(u => u.name == req.params.name);
+  if (!user) {
+    return next();
+  }
+  res.json(user);
+});
+
+//Search user by boolean query
+router.get('/search/:query', (req, res) => {
+  const query = req.params.query;
+  const user = users.find(u => u.name.includes(query) || u.username.includes(query) || u.email.includes(query));
   if (!user) {
     return next();
   }
