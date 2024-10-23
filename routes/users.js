@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const error = require("../utilities/error.js")
 const users = require("../data/users.js")
+const posts = require("../data/posts.js")
 
 // BASE PATH FOR THIS ROUTER IS: /api/users
 
@@ -51,7 +52,7 @@ router.get('/name/:name', (req, res) => {
   res.json(user);
 });
 
-//Search user by boolean query
+//Search users by query
 router.get('/search/:query', (req, res) => {
   const query = req.params.query;
   const user = users.find(u => u.name.includes(query) || u.username.includes(query) || u.email.includes(query));
@@ -60,6 +61,19 @@ router.get('/search/:query', (req, res) => {
   }
   res.json(user);
 });
+
+// Retrieves all posts by a user with the specified id.
+router.get('/:id/posts', (req, res) => {
+  const postsByUser = posts.filter(p => p.userId == req.params.id)
+  res.json(postsByUser)
+})
+
+// Retrieves all posts by a user with the specified postId.
+router.get('/posts/:userId', (req, res) => {  
+  const postsByUser = posts.filter(p => p.userId == req.query.userId)
+  res.json(postsByUser)
+})
+
 
 
 // Create User

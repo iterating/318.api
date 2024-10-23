@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const posts = require("../data/posts.js")
 const error = require("../utilities/error.js")
-
+const users = require("../data/users.js")
 
 //////////////POSTS//////////////
 router.get('/', (req, res) => {
@@ -38,6 +38,15 @@ router.get('/:id', (req, res, next) => {
   if (post) res.json({ post, links });
   else next()
 })
+
+
+// Search post by query
+router.get('/search/:query', (req, res) => {
+  const query = req.params.query
+  const posts = posts.filter(p => p.title.includes(query) || p.content.includes(query))
+  res.json({ posts })
+})
+
 
 // Create Post
 router.post('/', (req, res) => {
@@ -91,5 +100,16 @@ router.delete("/:id", (req, res) => {
   else next()
 })
 
+
+// Retrieves all posts by a user with the specified postId.
+router.get("/", (req, res) => {
+  const userId = req.query.userId;
+  if (!userId) {
+    return res.status(400).json({ error: "userId query parameter is required" });
+  }
+
+  const postsByUser = posts.filter(p => p.userId == userId);
+  res.json(postsByUser);
+});
 
 module.exports = router

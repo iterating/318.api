@@ -55,6 +55,7 @@ const apiKeys = process.env["API-KEYS"]
 //Router Set Up
 app.use("/api/users", usersRouter)
 app.use("/api/posts", postsRouter)
+app.use("/api/comments", postsRouter)
 
 
 // New User form
