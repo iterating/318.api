@@ -143,6 +143,17 @@ router.delete("/:id", (req, res) => {
 
 })
 
+// Retrieves all comments by a user with the specified id.
+router.get('/:id/comments', (req, res) => {
+  const commentsByUser = comments.filter(c => c.userId == req.params.id)
+  res.json(commentsByUser)
+})
 
+
+// Retrieves comments made by the user with the specified id on the post with the specified postId.
+router.get('/users/:id/comments', (req, res) => {  
+  const commentsByUserOnPost = comments.filter(c => c.userId == req.params.id && c.postId == req.query.postId)
+  res.json(commentsByUserOnPost)
+})
 
 module.exports = router

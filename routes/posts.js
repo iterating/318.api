@@ -112,4 +112,17 @@ router.get("/", (req, res) => {
   res.json(postsByUser);
 });
 
+// Retrieves all comments made on the post with the specified id.
+router.get('/:id/comments', (req, res) => {  
+  const commentsByPost = comments.filter(c => c.postId == req.params.id)
+  res.json(commentsByPost)
+})
+
+// Retrieves all comments made on the post with the specified id by a user with the specified userId.
+router.get('/:id/comments', (req, res) => {  
+  const commentsByUserOnPost = comments.filter(c => c.postId == req.params.id && c.userId == req.query.userId)
+  res.json(commentsByUserOnPost)
+})
+
+
 module.exports = router
