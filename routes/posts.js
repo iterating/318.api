@@ -3,19 +3,20 @@ const router = express.Router();
 const posts = require("../data/posts.js")
 const error = require("../utilities/error.js")
 const users = require("../data/users.js")
+const comments = require("../data/comments.js")
 
 //////////////POSTS//////////////
-router.get('/', (req, res) => {
-  const links = [
-    {
-      href: "posts/:id",
-      rel: ":id",
-      type: "GET",
-    },
-  ];
+// router.get('/', (req, res) => {
+//   const links = [
+//     {
+//       href: "posts/:id",
+//       rel: ":id",
+//       type: "GET",
+//     },
+//   ];
 
-  res.json({ posts, links });
-})
+//   res.json({ posts, links });
+// })
 
 router.get('/:id', (req, res, next) => {
   const post = posts.find(p => p.id == req.params.id)
@@ -32,20 +33,13 @@ router.get('/:id', (req, res, next) => {
       type: "DELETE",
     },
   ];
-
-  
-
   if (post) res.json({ post, links });
   else next()
 })
 
 
-// Search post by query
-router.get('/search/:query', (req, res) => {
-  const query = req.params.query
-  const posts = posts.filter(p => p.title.includes(query) || p.content.includes(query))
-  res.json({ posts })
-})
+
+
 
 
 // Create Post
@@ -101,16 +95,17 @@ router.delete("/:id", (req, res) => {
 })
 
 
-// Retrieves all posts by a user with the specified postId.
-router.get("/", (req, res) => {
-  const userId = req.query.userId;
-  if (!userId) {
-    return res.status(400).json({ error: "userId query parameter is required" });
-  }
+// Retrieves all posts by a user with the specified userId /api/posts?userId=userId
+router.get('/', (req, res) => {
+const userID = req.query.userId
+if (userID) {
+  const user = users.find(u => u.id == userID)
+  res.json(user)
+} else {
+  res.json({posts}) 
+}
+})
 
-  const postsByUser = posts.filter(p => p.userId == userId);
-  res.json(postsByUser);
-});
 
 // Retrieves all comments made on the post with the specified id.
 router.get('/:id/comments', (req, res) => {  
@@ -118,11 +113,20 @@ router.get('/:id/comments', (req, res) => {
   res.json(commentsByPost)
 })
 
+
 // Retrieves all comments made on the post with the specified id by a user with the specified userId.
-router.get('/:id/comments', (req, res) => {  
-  const commentsByUserOnPost = comments.filter(c => c.postId == req.params.id && c.userId == req.query.userId)
-  res.json(commentsByUserOnPost)
+router.get('/:id/comments', (req, res) => {
+  const userId = req.query.userId;
+  const commentsByUserOnPost = comments.filter(c => c.postId == req.params.id && c.userId == userId);
+  res.json(commentsByUserOnPost);
 })
 
+
+// // Search post by query
+// router.get('/search/:query', (req, res) => {
+//   const query = req.params.query.toLowerCase()
+//   const posts = posts.filter(p => p.title.toLowerCase().includes(query) || p.content.toLowerCase().includes(query))
+//   res.json({ posts })
+// })
 
 module.exports = router

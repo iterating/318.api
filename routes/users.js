@@ -3,29 +3,29 @@ const router = express.Router();
 const error = require("../utilities/error.js")
 const users = require("../data/users.js")
 const posts = require("../data/posts.js")
+const comments = require("../data/comments.js")
 
 // BASE PATH FOR THIS ROUTER IS: /api/users
 
 //////////////USERS//////////////
 // Creating a simple GET route for individual users,
 // using a route parameter for the unique id.
-router.get('/', (req, res) => {
-  const links = [
-    {
-      href: "users/:id",
-      rel: ":id",
-      type: "GET",
-    },
-  ];
+// router.get('/', (req, res) => {
+//   const links = [
+//     {
+//       href: "users/:id",
+//       rel: ":id",
+//       type: "GET",
+//     },
+//   ];
 
-  res.json({ users, links });
-})
+//   res.json({ users, links });
+// })
 
 // Creating a simple GET route for individual users,
 // using a route parameter for the unique id.
 router.get('/:id', (req, res) => {
   const user = users.find(u => u.id == req.params.id)
-  console.log(user)
   const links = [
     {
       href: `/${req.params.id}`,
@@ -45,7 +45,17 @@ router.get('/:id', (req, res) => {
 
 //Search user by name
 router.get('/name/:name', (req, res) => {
-  const user = users.find(u => u.name == req.params.name);
+const user = users.find(u => u.name.toLowerCase() == req.params.name.toLowerCase());
+if (!user) {
+  return next();
+}
+res.json(user);
+});
+
+//Search user by name by query
+router.get('/', (req, res) => {
+  const name = req.query.name
+  const user = users.find(u => u.name.toLowerCase() == name.toLowerCase());
   if (!user) {
     return next();
   }
@@ -54,8 +64,8 @@ router.get('/name/:name', (req, res) => {
 
 //Search users by query
 router.get('/search/:query', (req, res) => {
-  const query = req.params.query;
-  const user = users.find(u => u.name.includes(query) || u.username.includes(query) || u.email.includes(query));
+  const query = req.params.query.toLowerCase();
+  const user = users.find(u => u.name.toLowerCase().includes(query) || u.username.toLowerCase().includes(query) || u.email.toLowerCase().includes(query));
   if (!user) {
     return next();
   }
@@ -68,12 +78,17 @@ router.get('/:id/posts', (req, res) => {
   res.json(postsByUser)
 })
 
-// Retrieves all posts by a user with the specified postId.
-router.get('/posts/:userId', (req, res) => {  
-  const postsByUser = posts.filter(p => p.userId == req.query.userId)
-  res.json(postsByUser)
-})
+// Retrieves all posts by a user with the specified id /posts?userId=userId
 
+router.get('/', (req, res) => {
+  const userID = req.query.userId
+  if (userID) {
+    const user = users.find(u => u.id == userID)
+    res.json(user)
+  } else {
+    res.json({users}) 
+  }
+})
 
 
 // Create User
@@ -143,16 +158,17 @@ router.delete("/:id", (req, res) => {
 
 })
 
-// Retrieves all comments by a user with the specified id.
+// Retrieves comments made by the user with the specified id.
 router.get('/:id/comments', (req, res) => {
   const commentsByUser = comments.filter(c => c.userId == req.params.id)
   res.json(commentsByUser)
 })
 
 
-// Retrieves comments made by the user with the specified id on the post with the specified postId.
-router.get('/users/:id/comments', (req, res) => {  
-  const commentsByUserOnPost = comments.filter(c => c.userId == req.params.id && c.postId == req.query.postId)
+// Retrieves comments made by the user with the specified id on the postwith the specified postId /users/:id/comments?postId=postId
+router.get('/:id/comments', (req, res) => {
+  const postId = req.query.postId
+  const commentsByUserOnPost = comments.filter(c => c.userId == req.params.id && c.postId == postId)
   res.json(commentsByUserOnPost)
 })
 

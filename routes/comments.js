@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
+const comments = require("../data/comments.js")
 const posts = require("../data/posts.js")
-const error = require("../utilities/error.js")
 const users = require("../data/users.js")
+const error = require("../utilities/error.js")
 
 router.post('/', (req, res) => {
   const { userId, postId, body } = req.body
@@ -62,15 +63,19 @@ router.delete("/:id", (req, res) => {
 })
 
 router.get('/', (req, res) => {
-  const { userId, postId } = req.query
+  const { userId, postId } = req.query;
 
   if (userId) {
-    const commentsByUser = comments.filter(c => c.userId == userId)
-    res.json(commentsByUser)
-  } else if (postId) {
-    const commentsByPost = comments.filter(c => c.postId == postId)
-    res.json(commentsByPost)
-  } else {
-    res.json(comments)
+    const commentsByUser = comments.filter(c => c.userId == userId);
+    return res.json(commentsByUser);
   }
-})
+
+  if (postId) {
+    const commentsByPost = comments.filter(c => c.postId == postId);
+    return res.json(commentsByPost);
+  }
+
+  res.json({ comments });
+});
+
+module.exports = router
