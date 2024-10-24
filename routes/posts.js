@@ -122,11 +122,13 @@ router.get('/:id/comments', (req, res) => {
 })
 
 
-// // Search post by query
-// router.get('/search/:query', (req, res) => {
-//   const query = req.params.query.toLowerCase()
-//   const posts = posts.filter(p => p.title.toLowerCase().includes(query) || p.content.toLowerCase().includes(query))
-//   res.json({ posts })
-// })
+// Search post by query
+router.get('/search/:query', (req, res) => {
+  const query = req.params.query.toLowerCase();
+  const searchResults = posts.filter(p => p.title.toLowerCase().includes(query) || p.content.toLowerCase().includes(query));
+  res.json(searchResults);
+})
+
+
 
 module.exports = router
